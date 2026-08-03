@@ -1744,3 +1744,29 @@ p  { color: var(--text-light); line-height: 1.75; }
   align-items: center;
   justify-content: center;
 }
+
+/* Billing toggle */
+.pricing-toggle {
+  display: inline-flex;
+  background: rgba(255,255,255,0.15);
+  border-radius: 999px;
+  padding: 4px;
+  margin-top: 32px;
+  gap: 4px;
+}
+
+.pricing-toggle__label {
+  cursor: pointer;
+  padding: 8px 24px;
+  border-radius: 999px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: rgba(255,255,255,0.7);
+  transition: all 0.2s ease;
+  user-select: none;
+}
+
+.pricing-toggle__label.active {
+  background: var(--white);
+  color: var(--navy);
+}
