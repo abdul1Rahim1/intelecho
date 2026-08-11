@@ -125,6 +125,9 @@
         document.body.style.overflow = '';
         var form = document.getElementById('payForm');
         if (form) form.reset();
+        if (form) form.style.display = '';
+        var success = document.getElementById('paySuccess');
+        if (success) success.style.display = 'none';
       }
     }
   });

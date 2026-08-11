@@ -1502,7 +1502,7 @@ p  { color: var(--text-light); line-height: 1.75; }
 .animate-in--delay-4 { animation-delay: 0.4s; }
 
 /* =========================================
-   PAYMENT MODAL (Razorpay Pre-Checkout)
+  PLAN ENQUIRY MODAL
    ========================================= */
 
 /* Overlay */
@@ -1712,6 +1712,29 @@ p  { color: var(--text-light); line-height: 1.75; }
   font-size: 0.85rem;
 }
 
+.pay-modal__success {
+  display: none;
+  padding: 36px 32px 40px;
+  text-align: center;
+}
+
+.pay-modal__success > i {
+  color: #16a34a;
+  font-size: 2.5rem;
+  margin-bottom: 16px;
+}
+
+.pay-modal__success h3 {
+  color: var(--navy);
+  margin-bottom: 8px;
+}
+
+.pay-modal__success p {
+  color: var(--text-light);
+  font-size: 0.9rem;
+  margin: 0;
+}
+
 /* Responsive */
 @media (max-width: 520px) {
   .pay-modal {
@@ -1724,6 +1747,7 @@ p  { color: var(--text-light); line-height: 1.75; }
     border-bottom-left-radius: 0;
     border-bottom-right-radius: 0;
   }
+
   .pay-modal.open {
     animation: payModalSlideUp 0.3s ease forwards;
   }

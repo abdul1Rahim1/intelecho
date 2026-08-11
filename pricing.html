@@ -10,8 +10,6 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.2/css/all.min.css" />
   <link rel="stylesheet" href="css/style.css" />
-  <!-- Razorpay Checkout SDK -->
-  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 </head>
 <body>
 
@@ -102,12 +100,8 @@
             </li>
           </ul>
 
-          <button class="btn btn-outline-dark rzp-trigger"
-            data-plan="Launch"
-            data-price-monthly="22000"
-            data-price-annual="189900"
-            data-desc="compareAI Launch Plan — 1,000 SKUs, 2x Monthly Comparison">
-            Subscribe Now
+          <button class="btn btn-outline-dark enquiry-trigger" data-plan="Launch">
+            Enquiry
           </button>
         </div>
 
@@ -143,12 +137,8 @@
             </li>
           </ul>
 
-          <button class="btn btn-primary rzp-trigger"
-            data-plan="Grow"
-            data-price-monthly="31000"
-            data-price-annual="259900"
-            data-desc="compareAI Grow Plan — 10,000 SKUs, 4x Monthly Comparison">
-            Subscribe Now
+          <button class="btn btn-primary enquiry-trigger" data-plan="Grow">
+            Enquiry
           </button>
         </div>
 
@@ -178,10 +168,9 @@
             <li class="pricing-card__feature"><span class="check">✓</span><strong>Dedicated account manager</strong></li>
           </ul>
 
-          <a href="https://mail.google.com/mail/?view=cm&fs=1&to=contact@intelechoai.com&su=Enterprise+Enquiry"
-            target="_blank" rel="noopener" class="btn btn-outline-dark">
-            <i class="fa-solid fa-envelope" style="margin-right:6px;"></i>Talk to Sales
-          </a>
+          <button class="btn btn-outline-dark enquiry-trigger" data-plan="Scale">
+            <i class="fa-solid fa-envelope" style="margin-right:6px;"></i>Enquiry
+          </button>
         </div>
 
       </div>
@@ -603,68 +592,19 @@
     }());
   </script>
 
-  <!-- ========================================================
-       RAZORPAY INTEGRATION TEMPLATE
-       ========================================================
-       SETUP CHECKLIST:
-       1. Replace RAZORPAY_KEY_ID with your live/test key from
-          https://dashboard.razorpay.com/app/keys
-       2. Replace RAZORPAY_BUSINESS_NAME with your company name
-       3. Replace RAZORPAY_LOGO_URL with a hosted logo URL (optional)
-       4. For production: generate order_id server-side via
-          POST https://api.razorpay.com/v1/orders  and pass it below.
-          (Without order_id the form still works in test mode.)
-       5. Replace PAYMENT_SUCCESS_URL / PAYMENT_FAILURE_URL with
-          actual redirect pages on your server.
-       ======================================================== -->
+  <!-- ======================== PLAN ENQUIRY ======================== -->
   <script>
     (function () {
-      // ── ① FILL THESE PARAMETERS ──────────────────────────────────
-      var RZP_CONFIG = {
-        key:          'RAZORPAY_KEY_ID',        // e.g. 'rzp_live_XXXXXXXXXX'
-        businessName: 'intelEcho Inc.',
-        logoUrl:      'RAZORPAY_LOGO_URL',      // hosted image URL or '' to omit
-        currency:     'INR',                    // change to 'CAD' if enabled on your account
-        successUrl:   'PAYMENT_SUCCESS_URL',    // e.g. '/thank-you.html'
-        failureUrl:   'PAYMENT_FAILURE_URL',    // e.g. '/payment-failed.html'
-        theme:        '#0077B6'                 // matches intelEcho brand colour
-      };
-      // ─────────────────────────────────────────────────────────────
-
-      // Payment modal elements
       var modal     = document.getElementById('payModal');
       var overlay   = document.getElementById('payOverlay');
       var form      = document.getElementById('payForm');
+      var success   = document.getElementById('paySuccess');
       var planLabel = document.getElementById('payPlanLabel');
-      var priceLabel= document.getElementById('payPriceLabel');
       var closeBtn  = document.getElementById('payClose');
 
-      var _currentPlan  = {};
-      var _billingCycle = 'monthly';
-
-      // Track active billing cycle from toggle
-      document.querySelectorAll('.pricing-toggle__label').forEach(function (lbl) {
-        lbl.addEventListener('click', function () {
-          _billingCycle = lbl.getAttribute('data-billing') || 'monthly';
-        });
-      });
-
-      // Open modal on any .rzp-trigger click
-      document.querySelectorAll('.rzp-trigger').forEach(function (btn) {
+      document.querySelectorAll('.enquiry-trigger').forEach(function (btn) {
         btn.addEventListener('click', function () {
-          _currentPlan = {
-            plan:  btn.getAttribute('data-plan'),
-            desc:  btn.getAttribute('data-desc'),
-            amount: _billingCycle === 'annual'
-                      ? parseInt(btn.getAttribute('data-price-annual'),  10)
-                      : parseInt(btn.getAttribute('data-price-monthly'), 10)
-          };
-          // Format display price (amount stored in subunits, e.g. paise or cents)
-          var display = ((_currentPlan.amount / 100).toLocaleString('en-US', {
-            style: 'currency', currency: RZP_CONFIG.currency
-          }));
-          planLabel.textContent  = _currentPlan.plan + ' Plan';
-          priceLabel.textContent = display + ' / month (' + _billingCycle + ' billing)';
+          planLabel.textContent = btn.getAttribute('data-plan') + ' Plan';
 
           modal.classList.add('open');
           overlay.classList.add('open');
@@ -678,139 +618,72 @@
         overlay.classList.remove('open');
         document.body.style.overflow = '';
         form.reset();
+        form.style.display = '';
+        success.style.display = 'none';
       }
       if (closeBtn)   closeBtn.addEventListener('click', closeModal);
       if (overlay)    overlay.addEventListener('click', closeModal);
 
-      // Form submit → open Razorpay checkout
       if (form) {
         form.addEventListener('submit', function (e) {
           e.preventDefault();
+          var email = document.getElementById('payEmail').value.trim();
+          if (!email) return;
 
-          var name    = document.getElementById('payName').value.trim();
-          var email   = document.getElementById('payEmail').value.trim();
-          var phone   = document.getElementById('payPhone').value.trim();
-
-          var options = {
-            key:         RZP_CONFIG.key,
-            amount:      _currentPlan.amount,   // in smallest currency unit
-            currency:    RZP_CONFIG.currency,
-            name:        RZP_CONFIG.businessName,
-            description: _currentPlan.desc,
-            image:       RZP_CONFIG.logoUrl || undefined,
-
-            // ── ② SERVER-SIDE ORDER ID (recommended for production) ──
-            // Generate via: POST https://api.razorpay.com/v1/orders
-            // Then pass the returned id here:
-            // order_id: 'ORDER_ID_FROM_YOUR_SERVER',
-
-            handler: function (response) {
-              // ── ③ VERIFY PAYMENT SIGNATURE ON YOUR SERVER ────────
-              // response.razorpay_payment_id
-              // response.razorpay_order_id
-              // response.razorpay_signature
-              // Send these to your backend endpoint for verification
-              // before granting access.
-              // ────────────────────────────────────────────────────
-
-              // Temporary client-side success redirect:
-              window.location.href = RZP_CONFIG.successUrl
-                + '?payment_id=' + encodeURIComponent(response.razorpay_payment_id)
-                + '&plan='       + encodeURIComponent(_currentPlan.plan);
-            },
-
-            prefill: {
-              name:    name,
-              email:   email,
-              contact: phone
-            },
-
-            notes: {
-              plan:    _currentPlan.plan,
-              billing: _billingCycle
-            },
-
-            modal: {
-              ondismiss: function () {
-                // User closed Razorpay checkout without paying
-                // Optionally redirect or log:
-                // window.location.href = RZP_CONFIG.failureUrl;
-              }
-            },
-
-            theme: { color: RZP_CONFIG.theme }
-          };
-
-          closeModal();
-
-          var rzp = new Razorpay(options);
-          rzp.on('payment.failed', function (resp) {
-            // resp.error contains: code, description, source, step, reason,
-            //                      metadata.order_id, metadata.payment_id
-            alert('Payment failed: ' + resp.error.description);
-            // window.location.href = RZP_CONFIG.failureUrl;
-          });
-          rzp.open();
+          document.getElementById('paySuccessEmail').textContent = email;
+          form.style.display = 'none';
+          success.style.display = 'block';
         });
       }
 
     }());
   </script>
 
-  <!-- ======================== PAYMENT MODAL ======================== -->
+  <!-- ======================== ENQUIRY MODAL ======================== -->
   <div class="pay-overlay" id="payOverlay"></div>
   <div class="pay-modal" id="payModal" role="dialog" aria-modal="true" aria-labelledby="payModalTitle">
     <button class="pay-modal__close" id="payClose" aria-label="Close">
       <i class="fa-solid fa-xmark"></i>
     </button>
     <div class="pay-modal__header">
-      <div class="pay-modal__logo">move<span>AI</span></div>
-      <h3 id="payModalTitle">Complete Your Subscription</h3>
-      <p>Enter your details to proceed to secure checkout.</p>
+      <div class="pay-modal__logo">intel<span>Echo</span></div>
+      <h3 id="payModalTitle">Send an Enquiry</h3>
+      <p>Tell us where to reach you about this plan.</p>
     </div>
 
     <div class="pay-modal__plan-summary">
       <div class="pay-modal__plan-row">
         <span class="pay-modal__plan-name" id="payPlanLabel">Grow Plan</span>
-        <span class="pay-modal__plan-price" id="payPriceLabel">$219 / month</span>
+        <span class="pay-modal__plan-price">Plan enquiry</span>
       </div>
       <div class="pay-modal__trial-note">
-        <i class="fa-solid fa-shield-halved"></i>
-        30-day money-back guarantee &mdash; cancel anytime
+        <i class="fa-solid fa-paper-plane"></i>
+        Our team will be in touch soon
       </div>
     </div>
 
     <form class="pay-modal__form" id="payForm" novalidate>
       <div class="pay-modal__field">
-        <label for="payName">Full Name <span aria-hidden="true">*</span></label>
-        <div class="pay-modal__input-wrap">
-          <i class="fa-solid fa-user"></i>
-          <input type="text" id="payName" placeholder="Jane Smith" required autocomplete="name" />
-        </div>
-      </div>
-      <div class="pay-modal__field">
-        <label for="payEmail">Work Email <span aria-hidden="true">*</span></label>
+        <label for="payEmail">Your email <span aria-hidden="true">*</span></label>
         <div class="pay-modal__input-wrap">
           <i class="fa-solid fa-envelope"></i>
           <input type="email" id="payEmail" placeholder="jane@yourcompany.com" required autocomplete="email" />
         </div>
       </div>
-      <div class="pay-modal__field">
-        <label for="payPhone">Phone Number <span aria-hidden="true">*</span></label>
-        <div class="pay-modal__input-wrap">
-          <i class="fa-solid fa-phone"></i>
-          <input type="tel" id="payPhone" placeholder="+1 416 000 0000" required autocomplete="tel" />
-        </div>
-      </div>
       <button type="submit" class="btn btn-primary pay-modal__submit">
-        <i class="fa-solid fa-lock"></i>
-        Proceed to Secure Checkout
+        <i class="fa-solid fa-paper-plane"></i>
+        Send Enquiry
       </button>
       <p class="pay-modal__secure-note">
-        <i class="fa-brands fa-razorpay"></i>
-        Secured by Razorpay &nbsp;&bull;&nbsp; 256-bit SSL encryption
+        <i class="fa-solid fa-lock"></i>
+        Your email is only used for this enquiry
       </p>
     </form>
+    <div class="pay-modal__success" id="paySuccess" aria-live="polite">
+      <i class="fa-solid fa-circle-check"></i>
+      <h3>Enquiry sent</h3>
+      <p>Thanks. We will contact you at <strong id="paySuccessEmail"></strong>.</p>
+    </div>
   </div>
 
 </body>
