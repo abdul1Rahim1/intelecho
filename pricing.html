@@ -592,6 +592,63 @@
     }());
   </script>
 
+  <!-- ======================== ENQUIRY MODAL ======================== -->
+  <div class="pay-overlay" id="payOverlay"></div>
+  <div class="pay-modal" id="payModal" role="dialog" aria-modal="true" aria-labelledby="payModalTitle">
+    <button class="pay-modal__close" id="payClose" aria-label="Close">
+      <i class="fa-solid fa-xmark"></i>
+    </button>
+    <div class="pay-modal__header">
+      <div class="pay-modal__logo">intel<span>Echo</span></div>
+      <h3 id="payModalTitle">Send an Enquiry</h3>
+      <p>Tell us where to reach you about this plan.</p>
+    </div>
+
+    <div class="pay-modal__plan-summary">
+      <div class="pay-modal__plan-row">
+        <span class="pay-modal__plan-name" id="payPlanLabel">Grow Plan</span>
+        <span class="pay-modal__plan-price">Plan enquiry</span>
+      </div>
+      <div class="pay-modal__trial-note">
+        <i class="fa-solid fa-paper-plane"></i>
+        Our team will be in touch soon
+      </div>
+    </div>
+
+    <form class="pay-modal__form" id="payForm" novalidate>
+      <div class="pay-modal__field">
+        <label for="payName">Name <span aria-hidden="true">*</span></label>
+        <div class="pay-modal__input-wrap">
+          <i class="fa-solid fa-user"></i>
+          <input type="text" id="payName" placeholder="Jane Smith" required autocomplete="name" />
+        </div>
+      </div>
+      <div class="pay-modal__field">
+        <label for="payPhone">Phone Number <span aria-hidden="true">*</span></label>
+        <div class="pay-modal__input-wrap">
+          <i class="fa-solid fa-phone"></i>
+          <input type="tel" id="payPhone" placeholder="+1 416 000 0000" required autocomplete="tel" />
+        </div>
+      </div>
+      <div class="pay-modal__field">
+        <label for="payEmail">Email <span aria-hidden="true">*</span></label>
+        <div class="pay-modal__input-wrap">
+          <i class="fa-solid fa-envelope"></i>
+          <input type="email" id="payEmail" placeholder="jane@yourcompany.com" required autocomplete="email" />
+        </div>
+      </div>
+      <button type="submit" class="btn btn-primary pay-modal__submit">
+        <i class="fa-solid fa-paper-plane"></i>
+        Send
+      </button>
+    </form>
+    <div class="pay-modal__success" id="paySuccess" aria-live="polite">
+      <i class="fa-solid fa-circle-check"></i>
+      <h3>Mail sent</h3>
+      <p>Thanks, we'll be in touch soon.</p>
+    </div>
+  </div>
+
   <!-- ======================== PLAN ENQUIRY ======================== -->
   <script>
     (function () {
@@ -627,10 +684,6 @@
       if (form) {
         form.addEventListener('submit', function (e) {
           e.preventDefault();
-          var email = document.getElementById('payEmail').value.trim();
-          if (!email) return;
-
-          document.getElementById('paySuccessEmail').textContent = email;
           form.style.display = 'none';
           success.style.display = 'block';
         });
@@ -638,53 +691,6 @@
 
     }());
   </script>
-
-  <!-- ======================== ENQUIRY MODAL ======================== -->
-  <div class="pay-overlay" id="payOverlay"></div>
-  <div class="pay-modal" id="payModal" role="dialog" aria-modal="true" aria-labelledby="payModalTitle">
-    <button class="pay-modal__close" id="payClose" aria-label="Close">
-      <i class="fa-solid fa-xmark"></i>
-    </button>
-    <div class="pay-modal__header">
-      <div class="pay-modal__logo">intel<span>Echo</span></div>
-      <h3 id="payModalTitle">Send an Enquiry</h3>
-      <p>Tell us where to reach you about this plan.</p>
-    </div>
-
-    <div class="pay-modal__plan-summary">
-      <div class="pay-modal__plan-row">
-        <span class="pay-modal__plan-name" id="payPlanLabel">Grow Plan</span>
-        <span class="pay-modal__plan-price">Plan enquiry</span>
-      </div>
-      <div class="pay-modal__trial-note">
-        <i class="fa-solid fa-paper-plane"></i>
-        Our team will be in touch soon
-      </div>
-    </div>
-
-    <form class="pay-modal__form" id="payForm" novalidate>
-      <div class="pay-modal__field">
-        <label for="payEmail">Your email <span aria-hidden="true">*</span></label>
-        <div class="pay-modal__input-wrap">
-          <i class="fa-solid fa-envelope"></i>
-          <input type="email" id="payEmail" placeholder="jane@yourcompany.com" required autocomplete="email" />
-        </div>
-      </div>
-      <button type="submit" class="btn btn-primary pay-modal__submit">
-        <i class="fa-solid fa-paper-plane"></i>
-        Send Enquiry
-      </button>
-      <p class="pay-modal__secure-note">
-        <i class="fa-solid fa-lock"></i>
-        Your email is only used for this enquiry
-      </p>
-    </form>
-    <div class="pay-modal__success" id="paySuccess" aria-live="polite">
-      <i class="fa-solid fa-circle-check"></i>
-      <h3>Enquiry sent</h3>
-      <p>Thanks. We will contact you at <strong id="paySuccessEmail"></strong>.</p>
-    </div>
-  </div>
 
 </body>
 </html>
