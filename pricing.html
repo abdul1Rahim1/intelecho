@@ -103,6 +103,10 @@
           <button class="btn btn-outline-dark enquiry-trigger" data-plan="Launch">
             Enquiry
           </button>
+          <br><br>
+            <button class="btn btn-outline-dark enquiry-trigger" data-plan="Scale">
+            <i  style="margin-right:6px;"></i>Choose Plan
+          </button>
         </div>
 
         <!-- PROFESSIONAL (FEATURED) -->
@@ -140,6 +144,10 @@
           <button class="btn btn-primary enquiry-trigger" data-plan="Grow">
             Enquiry
           </button>
+          <br><br>
+            <button class="btn btn-outline-dark enquiry-trigger" data-plan="Scale">
+            <i  style="margin-right:6px;"></i>Choose Plan
+          </button>
         </div>
 
         <!-- ENTERPRISE -->
@@ -170,6 +178,10 @@
 
           <button class="btn btn-outline-dark enquiry-trigger" data-plan="Scale">
             <i class="fa-solid fa-envelope" style="margin-right:6px;"></i>Enquiry
+          </button>
+          <br><br>
+            <button class="btn btn-outline-dark enquiry-trigger" data-plan="Scale">
+            <i  style="margin-right:6px;"></i>Choose Plan
           </button>
         </div>
 
@@ -650,7 +662,7 @@
   </div>
 
   <!-- ======================== PLAN ENQUIRY ======================== -->
-  <script>
+  <!-- <script>
     (function () {
       var modal     = document.getElementById('payModal');
       var overlay   = document.getElementById('payOverlay');
@@ -690,7 +702,80 @@
       }
 
     }());
-  </script>
+  </script> -->
+
+  <!-- ======================== PLAN SELECTION & NAVIGATION ======================== -->
+<script>
+  (function () {
+    var modal     = document.getElementById('payModal');
+    var overlay   = document.getElementById('payOverlay');
+    var form      = document.getElementById('payForm');
+    var success   = document.getElementById('paySuccess');
+    var planLabel = document.getElementById('payPlanLabel');
+    var closeBtn  = document.getElementById('payClose');
+
+    // Current selected billing frequency ('annual' by default based on initial state)
+    var currentBilling = 'annual';
+
+    // Track toggle changes
+    var toggleMonthly = document.getElementById('toggleMonthly');
+    var toggleAnnual  = document.getElementById('toggleAnnual');
+
+    if (toggleMonthly && toggleAnnual) {
+      toggleMonthly.addEventListener('click', function() { currentBilling = 'monthly'; });
+      toggleAnnual.addEventListener('click', function() { currentBilling = 'annual'; });
+    }
+
+    // Attach click handlers to buttons
+    document.querySelectorAll('.pricing-card').forEach(function (card) {
+      var buttons = card.querySelectorAll('button');
+
+      buttons.forEach(function (btn) {
+        var btnText = btn.textContent.trim().toLowerCase();
+
+        if (btnText.includes('choose plan')) {
+          // REDIRECT TO CHECKOUT PAGE
+          btn.addEventListener('click', function (e) {
+            e.preventDefault();
+            var plan = btn.getAttribute('data-plan') || 'Launch';
+            window.location.href = 'checkout.html?plan=' + encodeURIComponent(plan) + '&billing=' + encodeURIComponent(currentBilling);
+          });
+        } else if (btnText.includes('enquiry')) {
+          // OPEN ENQUIRY MODAL
+          btn.addEventListener('click', function () {
+            planLabel.textContent = btn.getAttribute('data-plan') + ' Plan';
+            modal.classList.add('open');
+            overlay.classList.add('open');
+            document.body.style.overflow = 'hidden';
+          });
+        }
+      });
+    });
+
+    // Close Modal Logic
+    function closeModal() {
+      modal.classList.remove('open');
+      overlay.classList.remove('open');
+      document.body.style.overflow = '';
+      if (form) {
+        form.reset();
+        form.style.display = '';
+      }
+      if (success) success.style.display = 'none';
+    }
+
+    if (closeBtn) closeBtn.addEventListener('click', closeModal);
+    if (overlay)  overlay.addEventListener('click', closeModal);
+
+    if (form) {
+      form.addEventListener('submit', function (e) {
+        e.preventDefault();
+        form.style.display = 'none';
+        if (success) success.style.display = 'block';
+      });
+    }
+  }());
+</script>
 
 </body>
 </html>
