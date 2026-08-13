@@ -165,6 +165,132 @@
       display: flex;
     }
 
+    /* PAYMENT METHOD SELECTION & CARD FORM MODAL */
+    .payment-modal-card {
+      width: 440px;
+      max-width: 92vw;
+      background: #ffffff;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+      display: none;
+      position: relative;
+    }
+    .modal-top-bar {
+      height: 24px;
+      background: #1e293b;
+    }
+    .modal-content-body {
+      padding: 24px;
+    }
+    .modal-section-title {
+      font-size: 0.8rem;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      color: #64748b;
+      text-transform: uppercase;
+      margin-bottom: 16px;
+    }
+
+    /* PAYMENT METHOD SELECTORS */
+    .method-option {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 12px 16px;
+      margin-bottom: 12px;
+      cursor: pointer;
+      background: #ffffff;
+      transition: all 0.2s;
+    }
+    .method-option.selected {
+      border-color: #2563eb;
+      background: #eff6ff;
+    }
+    .method-left {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .method-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      background: #f1f5f9;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #2563eb;
+      font-size: 1.1rem;
+    }
+    .method-info h4 {
+      margin: 0;
+      font-size: 0.95rem;
+      color: #0f172a;
+      font-weight: 600;
+    }
+    .method-info p {
+      margin: 2px 0 0;
+      font-size: 0.8rem;
+      color: #64748b;
+    }
+    .method-arrow {
+      color: #cbd5e1;
+      font-size: 0.9rem;
+    }
+    .method-option.selected .method-arrow {
+      color: #2563eb;
+    }
+
+    /* CARD FORM INPUT FIELDS */
+    .input-form-group {
+      margin-top: 16px;
+    }
+    .input-form-group label {
+      display: block;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: #1e293b;
+      margin-bottom: 6px;
+    }
+    .input-form-group input {
+      width: 100%;
+      padding: 10px 14px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 0.95rem;
+      box-sizing: border-box;
+      outline: none;
+      color: #0f172a;
+    }
+    .input-form-group input:focus {
+      border-color: #2563eb;
+    }
+    .input-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .btn-green-submit {
+      width: 100%;
+      margin-top: 20px;
+      padding: 12px;
+      background: #10b981;
+      color: #ffffff;
+      font-weight: 700;
+      font-size: 1rem;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .btn-green-submit:hover {
+      background: #059669;
+    }
+
     /* ENLARGED VISA LOADING BOX */
     .visa-loader-box {
       width: 480px;
@@ -173,7 +299,7 @@
       border-radius: 12px;
       padding: 48px 40px 40px;
       box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.35);
-      display: flex;
+      display: none;
       flex-direction: column;
       align-items: center;
       justify-content: center;
@@ -520,7 +646,79 @@
   <!-- MODAL OVERLAY -->
   <div class="modal-overlay" id="paymentOverlay">
     
-    <!-- INITIAL VISA LOADING POPUP -->
+    <!-- STEP 1: PAYMENT METHOD SELECTOR & INPUT FORM -->
+    <div class="payment-modal-card" id="paymentModalCard">
+      <div class="modal-top-bar"></div>
+      <div class="modal-content-body">
+        
+        <div class="modal-section-title">Select Payment Method</div>
+
+        <!-- Option 1: Credit / Debit Card -->
+        <div class="method-option selected">
+          <div class="method-left">
+            <div class="method-icon"><i class="fa-regular fa-credit-card"></i></div>
+            <div class="method-info">
+              <h4>Credit / Debit Card</h4>
+              <p>Visa, Mastercard, RuPay, Amex</p>
+            </div>
+          </div>
+          <div class="method-arrow"><i class="fa-solid fa-chevron-right"></i></div>
+        </div>
+
+        <!-- Option 2: Wallets -->
+        <div class="method-option">
+          <div class="method-left">
+            <div class="method-icon" style="color: #0284c7;"><i class="fa-solid fa-wallet"></i></div>
+            <div class="method-info">
+              <h4>Wallets</h4>
+              <p>Paytm, Amazon Pay, Mobikwik</p>
+            </div>
+          </div>
+          <div class="method-arrow"><i class="fa-solid fa-chevron-right"></i></div>
+        </div>
+
+        <!-- Option 3: International Card -->
+        <div class="method-option">
+          <div class="method-left">
+            <div class="method-icon" style="color: #0d9488;"><i class="fa-solid fa-globe"></i></div>
+            <div class="method-info">
+              <h4>International Card</h4>
+              <p>Visa / Mastercard / Amex</p>
+            </div>
+          </div>
+          <div class="method-arrow"><i class="fa-solid fa-chevron-right"></i></div>
+        </div>
+
+        <!-- CARD INPUT FORM -->
+        <div class="input-form-group">
+          <label>Cardholder Name</label>
+          <input type="text" id="cardholderInput"  placeholder="John Doe" />
+        </div>
+
+        <div class="input-form-group">
+          <label>Card Number</label>
+          <input type="text" id="cardNumberInput"  placeholder="4532 •••• •••• 7448" />
+        </div>
+
+        <div class="input-row">
+          <div class="input-form-group">
+            <label>Expiry Date</label>
+            <input type="text" id="expiryInput" placeholder="MM / YY" />
+          </div>
+          <div class="input-form-group">
+            <label>CVV / CVC</label>
+            <input type="password" id="cvvInput" placeholder="•••" />
+          </div>
+        </div>
+
+        <button class="btn-green-submit" id="submitPaymentBtn">
+          Pay <span id="payBtnAmount">$220.00</span>
+        </button>
+
+      </div>
+    </div>
+
+    <!-- STEP 2: VISA LOADING POPUP -->
     <div class="visa-loader-box" id="visaLoaderBox">
       <div class="visa-progress-bar">
         <div class="visa-progress-fill" id="visaProgressFill"></div>
@@ -528,7 +726,7 @@
       <div class="visa-logo-text">VISA</div>
     </div>
 
-    <!-- SECOND FACTOR AUTHENTICATION POPUP -->
+    <!-- STEP 3: SECOND FACTOR AUTHENTICATION POPUP -->
     <div class="bank-auth-card" id="bankAuthCard">
       <div class="bank-header">
         <div class="bank-logo-group">
@@ -602,7 +800,7 @@
       </div>
     </div>
 
-    <!-- PAYMENT TRANSFERRING POPUP (5-SECOND STATE) -->
+    <!-- STEP 4: PAYMENT TRANSFERRING POPUP -->
     <div class="transfer-modal-card" id="transferModalCard">
       <div class="transfer-icon-circle">
         <i class="fa-solid fa-arrow-right-arrow-left"></i>
@@ -616,7 +814,7 @@
       </div>
     </div>
 
-    <!-- PAYMENT SUCCESSFUL POPUP WITH DOWNLOAD INVOICE BUTTON -->
+    <!-- STEP 5: PAYMENT SUCCESSFUL POPUP WITH DOWNLOAD INVOICE BUTTON -->
     <div class="success-modal-card" id="successModalCard">
       <div class="success-icon-circle">
         <i class="fa-solid fa-check"></i>
@@ -710,6 +908,7 @@
     document.getElementById('summaryItemName').textContent = `${selectedPlanKey} Plan`;
     document.getElementById('summaryBasePrice').textContent = `$${amount.toFixed(2)}`;
     document.getElementById('summaryTotal').textContent = `$${amount.toFixed(2)} ${priceInfo.label}`;
+    document.getElementById('payBtnAmount').textContent = `$${amount.toFixed(2)}`;
 
     // Update Auth Card Details
     document.getElementById('authAmount').textContent = `USD ${amount}`;
@@ -723,6 +922,8 @@
     // Payment Workflow Elements
     const startPaymentBtn      = document.getElementById('startPaymentBtn');
     const paymentOverlay       = document.getElementById('paymentOverlay');
+    const paymentModalCard     = document.getElementById('paymentModalCard');
+    const submitPaymentBtn     = document.getElementById('submitPaymentBtn');
     const visaLoaderBox        = document.getElementById('visaLoaderBox');
     const visaProgressFill     = document.getElementById('visaProgressFill');
     const bankAuthCard         = document.getElementById('bankAuthCard');
@@ -738,18 +939,34 @@
 
     let countdownInterval;
 
-    // Step 1: Click "Proceed to Payment" -> VISA Loader fills 0% to 100% over 10 seconds
+    // Method selection toggling
+    document.querySelectorAll('.method-option').forEach(option => {
+      option.addEventListener('click', function() {
+        document.querySelectorAll('.method-option').forEach(o => o.classList.remove('selected'));
+        this.classList.add('selected');
+      });
+    });
+
+    // Step 1: Open Payment Method Modal
     startPaymentBtn.addEventListener('click', function() {
       paymentOverlay.classList.add('active');
-      visaLoaderBox.style.display = 'flex';
+      paymentModalCard.style.display = 'block';
+      visaLoaderBox.style.display = 'none';
       bankAuthCard.style.display = 'none';
       transferModalCard.style.display = 'none';
       successCard.style.display = 'none';
+    });
+
+    // Step 2: Click Pay -> Start 10s VISA Loader
+    submitPaymentBtn.addEventListener('click', function() {
+      paymentModalCard.style.display = 'none';
+      visaLoaderBox.style.display = 'flex';
 
       visaProgressFill.classList.remove('animating-10s');
       void visaProgressFill.offsetWidth;
       visaProgressFill.classList.add('animating-10s');
 
+      // Step 3: Show Bank Authentication Modal after 10 seconds
       setTimeout(function() {
         visaLoaderBox.style.display = 'none';
         bankAuthCard.style.display = 'block';
@@ -771,7 +988,7 @@
       }, 10000);
     });
 
-    // Step 2: Click "Submit" on OTP -> Inline spinner for 10s -> "Payment Transferring..." popup for 5s -> Success
+    // Step 4: Submit OTP -> Loader (10s) -> Transferring (5s) -> Success
     submitOtpBtn.addEventListener('click', function() {
       if (!otpInputField.value.trim()) {
         alert('Please enter the OTP sent to your registered mobile number.');
