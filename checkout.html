@@ -1,0 +1,908 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Checkout — compareAI by intelEcho</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.2/css/all.min.css" />
+  <link rel="stylesheet" href="css/style.css" />
+  <style>
+    :root {
+      --navy: #0f172a;
+      --accent: #2563eb;
+      --accent-hover: #1d4ed8;
+      --green: #10b981;
+      --border: #e2e8f0;
+      --bg-gray: #f8fafc;
+      --text-muted: #64748b;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      margin: 0;
+      padding: 0;
+      background: var(--bg-gray);
+    }
+
+    .checkout-section {
+      padding: 60px 0;
+      background: var(--bg-gray);
+      min-height: calc(100vh - 80px);
+    }
+    .checkout-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 32px;
+      align-items: start;
+    }
+    @media (max-width: 868px) {
+      .checkout-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+    .checkout-card {
+      background: #ffffff;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 32px;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+    }
+    .checkout-card h2 {
+      margin-top: 0;
+      margin-bottom: 24px;
+      font-size: 1.5rem;
+      color: #0f172a;
+    }
+    .summary-row {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 12px;
+      font-size: 0.95rem;
+      color: #475569;
+    }
+    .summary-row.total {
+      font-weight: 800;
+      font-size: 1.25rem;
+      color: #0f172a;
+      border-top: 2px solid #e2e8f0;
+      padding-top: 16px;
+      margin-top: 16px;
+    }
+    .plan-meta {
+      background: #f1f5f9;
+      padding: 16px;
+      border-radius: 8px;
+      margin-bottom: 24px;
+    }
+    .plan-meta p {
+      margin: 4px 0;
+      font-size: 0.9rem;
+      color: #334155;
+    }
+    .tax-badge {
+      display: inline-block;
+      background: #e0f2fe;
+      color: #0369a1;
+      font-size: 0.8rem;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 4px;
+      margin-top: 4px;
+    }
+    .feature-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    .feature-list li {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 12px;
+      font-size: 0.95rem;
+      color: #334155;
+    }
+    .feature-list .check {
+      color: #10b981;
+      font-weight: bold;
+    }
+
+    .btn-pay {
+      width: 100%;
+      margin-top: 24px;
+      padding: 14px;
+      background: #2563eb;
+      color: #ffffff;
+      font-weight: 700;
+      font-size: 1rem;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .btn-pay:hover {
+      background: #1d4ed8;
+    }
+
+    .btn-secondary {
+      width: 100%;
+      margin-top: 10px;
+      padding: 12px;
+      background: #f1f5f9;
+      color: #0f172a;
+      font-weight: 700;
+      font-size: 0.95rem;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: background 0.2s;
+    }
+    .btn-secondary:hover {
+      background: #e2e8f0;
+    }
+
+    /* GLOBAL OVERLAY */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.65);
+      z-index: 2000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+    }
+    .modal-overlay.active {
+      display: flex;
+    }
+
+    /* ENLARGED VISA LOADING BOX */
+    .visa-loader-box {
+      width: 480px;
+      max-width: 90vw;
+      background: #ffffff;
+      border-radius: 12px;
+      padding: 48px 40px 40px;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.35);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+    .visa-progress-bar {
+      width: 100%;
+      height: 28px;
+      background: #f1f0fe;
+      overflow: hidden;
+      margin-bottom: 36px;
+      position: relative;
+    }
+    .visa-progress-fill {
+      height: 100%;
+      width: 0%;
+      background: #060081;
+      transform: skewX(-20deg);
+      position: absolute;
+      left: 0;
+    }
+    .visa-progress-fill.animating-10s {
+      animation: visaFill10s 10s linear forwards;
+    }
+    @keyframes visaFill10s {
+      0% { width: 0%; }
+      100% { width: 100%; }
+    }
+
+    .visa-logo-text {
+      font-size: 3.5rem;
+      font-weight: 900;
+      font-style: italic;
+      color: #1a1f71;
+      letter-spacing: -1.5px;
+      font-family: Arial, sans-serif;
+    }
+
+    /* SECOND FACTOR AUTHENTICATION MODAL */
+    .bank-auth-card {
+      width: 100%;
+      max-width: 520px;
+      background: #ffffff;
+      border: 1px solid #1a365d;
+      border-radius: 4px;
+      padding: 24px 28px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+      font-family: Arial, sans-serif;
+      box-sizing: border-box;
+      display: none;
+      position: relative;
+    }
+    .bank-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+    .bank-logo-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .bank-logo-icon {
+      width: 36px;
+      height: 36px;
+      background: #003399;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2px;
+      padding: 3px;
+    }
+    .bank-logo-icon div {
+      background: #ffffff;
+    }
+    .bank-title-text {
+      color: #002B7F;
+      font-size: 0.95rem;
+      font-weight: bold;
+      line-height: 1.1;
+    }
+    .bank-subtext {
+      font-size: 0.7rem;
+      color: #333333;
+    }
+    .visa-card-logo {
+      font-size: 2.2rem;
+      font-weight: 900;
+      font-style: italic;
+      color: #002B7F;
+      font-family: Arial, sans-serif;
+    }
+    .auth-title {
+      text-align: center;
+      color: #0000cc;
+      font-size: 1.35rem;
+      font-weight: bold;
+      margin-bottom: 16px;
+    }
+    .auth-instruction {
+      color: #002B7F;
+      font-size: 0.9rem;
+      line-height: 1.45;
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .auth-details-table {
+      width: 100%;
+      margin-bottom: 20px;
+      border-collapse: collapse;
+    }
+    .auth-details-table td {
+      padding: 5px 0;
+      font-size: 0.9rem;
+      color: #002B7F;
+    }
+    .auth-details-table td:first-child {
+      text-align: right;
+      width: 42%;
+      padding-right: 12px;
+      font-weight: bold;
+    }
+    .auth-details-table td:last-child {
+      text-align: left;
+    }
+    .otp-input-field {
+      width: 120px;
+      padding: 4px 8px;
+      border: 1px solid #7f9db9;
+      font-size: 0.95rem;
+      outline: none;
+    }
+    .regenerate-link {
+      text-align: center;
+      margin-top: 10px;
+      margin-bottom: 6px;
+    }
+    .regenerate-link a {
+      color: #002B7F;
+      font-weight: bold;
+      font-size: 0.9rem;
+      text-decoration: none;
+    }
+    .redirect-timer-text {
+      text-align: center;
+      color: #0000cc;
+      font-weight: bold;
+      font-size: 0.85rem;
+      margin-bottom: 20px;
+    }
+    .auth-btn-row {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      margin-bottom: 24px;
+    }
+    .btn-bank {
+      background: linear-gradient(to bottom, #2b5797 0%, #002a66 100%);
+      color: #ffffff;
+      border: 1px solid #001f4d;
+      padding: 4px 16px;
+      font-size: 0.85rem;
+      font-weight: bold;
+      cursor: pointer;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.3);
+    }
+    .btn-bank:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+    .isg-footer {
+      text-align: center;
+      font-size: 0.85rem;
+      color: #002B7F;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+    .isg-logo {
+      color: #cc0000;
+      font-weight: 900;
+      font-size: 1.1rem;
+      letter-spacing: -0.5px;
+    }
+
+    /* INLINE OTP LOADING OVERLAY */
+    .otp-loading-box {
+      display: none;
+      text-align: center;
+      padding: 12px 0 20px;
+    }
+    .otp-spinner {
+      width: 28px;
+      height: 28px;
+      border: 3px solid #e2e8f0;
+      border-top: 3px solid #002B7F;
+      border-radius: 50%;
+      animation: otpSpin 0.8s linear infinite;
+      margin: 0 auto 10px;
+    }
+    @keyframes otpSpin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    .otp-loading-text {
+      color: #002B7F;
+      font-size: 0.9rem;
+      font-weight: bold;
+    }
+
+    /* PAYMENT TRANSFERRING POPUP (5-SECOND STATE) */
+    .transfer-modal-card {
+      width: 420px;
+      max-width: 90vw;
+      background: #ffffff;
+      border-radius: 12px;
+      padding: 40px 32px;
+      text-align: center;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3);
+      display: none;
+    }
+    .transfer-icon-circle {
+      width: 56px;
+      height: 56px;
+      background: #eff6ff;
+      color: #2563eb;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      margin: 0 auto 16px;
+    }
+    .transfer-progress-track {
+      width: 100%;
+      height: 10px;
+      background: #e2e8f0;
+      border-radius: 5px;
+      overflow: hidden;
+      margin-top: 20px;
+    }
+    .transfer-progress-fill {
+      height: 100%;
+      width: 0%;
+      background: #2563eb;
+      border-radius: 5px;
+    }
+    .transfer-progress-fill.animating-5s {
+      animation: transferFill5s 5s linear forwards;
+    }
+    @keyframes transferFill5s {
+      0% { width: 0%; }
+      100% { width: 100%; }
+    }
+
+    /* PAYMENT SUCCESSFUL STATE */
+    .success-modal-card {
+      width: 400px;
+      background: #ffffff;
+      border-radius: 12px;
+      padding: 36px 28px;
+      text-align: center;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3);
+      display: none;
+    }
+    .success-icon-circle {
+      width: 64px;
+      height: 64px;
+      background: #ecfdf5;
+      color: #10b981;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2rem;
+      margin: 0 auto 16px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAVIGATION -->
+  <nav class="nav" id="navbar">
+    <div class="nav__inner">
+      <a href="index.html" class="nav__logo">
+        <div class="nav__logo-icon">
+          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+          </svg>
+        </div>
+        intel<span class="accent">Echo</span>
+      </a>
+      <ul class="nav__links">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="pricing.html">Pricing</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <section class="checkout-section">
+    <div class="container">
+      <div class="checkout-grid">
+        
+        <!-- LEFT SIDE: Order Summary -->
+        <div class="checkout-card">
+          <h2>Order Summary</h2>
+          
+          <div class="plan-meta">
+            <p><strong>Plan:</strong> <span id="summaryPlan">Starter — Launch</span></p>
+            <p><strong>Billing:</strong> <span id="summaryBilling">Monthly</span></p>
+            <span class="tax-badge">GST Included</span>
+          </div>
+
+          <div class="summary-row">
+            <span>Item</span>
+            <span id="summaryItemName">Launch Plan</span>
+          </div>
+          <div class="summary-row">
+            <span>Price (Tax Included)</span>
+            <span id="summaryBasePrice">$220.00</span>
+          </div>
+          
+          <div class="summary-row total">
+            <span>Total Amount</span>
+            <span id="summaryTotal">$220.00 / month</span>
+          </div>
+
+          <button class="btn-pay" id="startPaymentBtn">
+            Proceed to Payment
+          </button>
+        </div>
+
+        <!-- RIGHT SIDE: Feature List -->
+        <div class="checkout-card">
+          <h2>Included Features</h2>
+          <ul class="feature-list" id="featureList">
+            <!-- Populated dynamically via JS -->
+          </ul>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- MODAL OVERLAY -->
+  <div class="modal-overlay" id="paymentOverlay">
+    
+    <!-- INITIAL VISA LOADING POPUP -->
+    <div class="visa-loader-box" id="visaLoaderBox">
+      <div class="visa-progress-bar">
+        <div class="visa-progress-fill" id="visaProgressFill"></div>
+      </div>
+      <div class="visa-logo-text">VISA</div>
+    </div>
+
+    <!-- SECOND FACTOR AUTHENTICATION POPUP -->
+    <div class="bank-auth-card" id="bankAuthCard">
+      <div class="bank-header">
+        <div class="bank-logo-group">
+          <div class="bank-logo-icon">
+            <div></div><div></div><div></div><div></div>
+          </div>
+          <div>
+            <div class="bank-title-text">इण्डियन ओवरसीज़ बैंक<br>Indian Overseas Bank</div>
+            <div class="bank-subtext">आपकी प्रगति का सच्चा साथी / Good people to grow with</div>
+          </div>
+        </div>
+        <div class="visa-card-logo">VISA</div>
+      </div>
+
+      <div class="auth-title">Second Factor Authentication</div>
+
+      <div class="auth-instruction">
+        The One Time Password has been sent to below registered Mobile Number. Please use the OTP to authenticate the transaction.
+      </div>
+
+      <table class="auth-details-table">
+        <tr>
+          <td>Mobile Number :</td>
+          <td>9*********0</td>
+        </tr>
+        <tr>
+          <td>Merchant Name :</td>
+          <td>intelEcho Inc.</td>
+        </tr>
+        <tr>
+          <td>Date :</td>
+          <td id="authDate">13-Aug-2026</td>
+        </tr>
+        <tr>
+          <td>Amount :</td>
+          <td id="authAmount">USD 220</td>
+        </tr>
+        <tr>
+          <td>Card Number :</td>
+          <td>XXXXXXXXXXXX7448</td>
+        </tr>
+        <tr>
+          <td>OTP :</td>
+          <td>
+            <input type="password" id="otpInputField" class="otp-input-field" maxlength="8" autocomplete="off" />
+          </td>
+        </tr>
+      </table>
+
+      <div class="regenerate-link">
+        <a href="#" onclick="return false;">Regenerate OTP</a>
+      </div>
+
+      <div class="redirect-timer-text">
+        Page will automatically redirect in <span id="countdownSec">99</span> seconds
+      </div>
+
+      <!-- INLINE LOADING STATE INSIDE BANK POPUP -->
+      <div class="otp-loading-box" id="otpLoadingBox">
+        <div class="otp-spinner"></div>
+        <div class="otp-loading-text">Verifying OTP, please wait...</div>
+      </div>
+
+      <div class="auth-btn-row" id="authBtnRow">
+        <button class="btn-bank" id="submitOtpBtn">Submit</button>
+        <button class="btn-bank" id="cancelOtpBtn">Cancel</button>
+      </div>
+
+      <div class="isg-footer">
+        Powered by <span class="isg-logo">iSG</span> <span style="font-size:0.65rem; color:#666;">Your Payments Partner</span>
+      </div>
+    </div>
+
+    <!-- PAYMENT TRANSFERRING POPUP (5-SECOND STATE) -->
+    <div class="transfer-modal-card" id="transferModalCard">
+      <div class="transfer-icon-circle">
+        <i class="fa-solid fa-arrow-right-arrow-left"></i>
+      </div>
+      <h3 style="margin: 0 0 8px; color: #0f172a; font-size: 1.25rem;">Payment Transferring...</h3>
+      <p style="margin: 0; font-size: 0.88rem; color: #64748b;">
+        Please do not refresh or close the page while we process your transaction.
+      </p>
+      <div class="transfer-progress-track">
+        <div class="transfer-progress-fill" id="transferProgressFill"></div>
+      </div>
+    </div>
+
+    <!-- PAYMENT SUCCESSFUL POPUP WITH DOWNLOAD INVOICE BUTTON -->
+    <div class="success-modal-card" id="successModalCard">
+      <div class="success-icon-circle">
+        <i class="fa-solid fa-check"></i>
+      </div>
+      <h3 style="margin: 0 0 8px; color: #0f172a; font-size: 1.3rem;">Payment Successful!</h3>
+      <p style="margin: 0 0 20px; font-size: 0.9rem; color: #64748b; line-height: 1.4;">
+        Thank you for your purchase. Your subscription for <strong>You Mart</strong> has been activated successfully.
+      </p>
+      
+      <button class="btn-secondary" id="downloadInvoiceBtn">
+        <i class="fa-solid fa-file-arrow-down"></i> Download Invoice
+      </button>
+
+      <button class="btn-pay" onclick="window.location.href='index.html'" style="margin-top: 10px;">
+        Return to Dashboard
+      </button>
+    </div>
+
+  </div>
+
+  <script>
+    // Updated Plan Database
+    const plansData = {
+      Launch: {
+        title: "Starter — Launch",
+        features: [
+          "Up to 1,000 active SKUs",
+          "2 price comparisons per month",
+          "1 ecommerce platform integration",
+          "Margin floor protection",
+          "Email support (48h response)",
+          "14-day change history",
+          "Real-time sync",
+          "API access"
+        ],
+        pricing: {
+          monthly: { price: 220, label: "/ month" },
+          annual: { price: 1899, label: "/ year" }
+        }
+      },
+      Grow: {
+        title: "Professional — Grow",
+        features: [
+          "Up to 10,000 active SKUs",
+          "15 marketplace monitors",
+          "4 price comparisons per month",
+          "3 ecommerce platform integrations",
+          "Advanced pricing rules engine",
+          "Priority email + chat support (4h response)",
+          "90-day change history & audit log",
+          "Competitive analytics dashboard",
+          "REST API access"
+        ],
+        pricing: {
+          monthly: { price: 310, label: "/ month" },
+          annual: { price: 2599, label: "/ year" }
+        }
+      },
+      Scale: {
+        title: "Starter — Launch",
+        features: [
+          "Unlimited SKUs",
+          "50+ marketplace monitors",
+          "Real-time sync (<30s latency)",
+          "Unlimited platform integrations",
+          "Custom AI pricing model training",
+          "24/7 phone + dedicated Slack channel",
+          "Unlimited change history & audit log",
+          "Dedicated account manager"
+        ],
+        pricing: {
+          monthly: { price: 220, label: "/ month" },
+          annual: { price: 9999, label: "/ year" }
+        }
+      }
+    };
+
+    // Parse URL parameters
+    const urlParams = new URLSearchParams(window.location.search);
+    const selectedPlanKey = urlParams.get('plan') || 'Launch';
+    const selectedBilling = urlParams.get('billing') || 'monthly';
+
+    const plan = plansData[selectedPlanKey] || plansData.Launch;
+    const priceInfo = plan.pricing[selectedBilling] || plan.pricing.monthly;
+
+    const amount = priceInfo.price;
+
+    // Update Order Summary
+    document.getElementById('summaryPlan').textContent = plan.title;
+    document.getElementById('summaryBilling').textContent = selectedBilling.charAt(0).toUpperCase() + selectedBilling.slice(1);
+    document.getElementById('summaryItemName').textContent = `${selectedPlanKey} Plan`;
+    document.getElementById('summaryBasePrice').textContent = `$${amount.toFixed(2)}`;
+    document.getElementById('summaryTotal').textContent = `$${amount.toFixed(2)} ${priceInfo.label}`;
+
+    // Update Auth Card Details
+    document.getElementById('authAmount').textContent = `USD ${amount}`;
+
+    // Populate Right Side (Features)
+    const featureContainer = document.getElementById('featureList');
+    featureContainer.innerHTML = plan.features
+      .map(feat => `<li><span class="check">✓</span> ${feat}</li>`)
+      .join('');
+
+    // Payment Workflow Elements
+    const startPaymentBtn      = document.getElementById('startPaymentBtn');
+    const paymentOverlay       = document.getElementById('paymentOverlay');
+    const visaLoaderBox        = document.getElementById('visaLoaderBox');
+    const visaProgressFill     = document.getElementById('visaProgressFill');
+    const bankAuthCard         = document.getElementById('bankAuthCard');
+    const transferModalCard    = document.getElementById('transferModalCard');
+    const transferProgressFill = document.getElementById('transferProgressFill');
+    const successCard          = document.getElementById('successModalCard');
+    const submitOtpBtn         = document.getElementById('submitOtpBtn');
+    const cancelOtpBtn         = document.getElementById('cancelOtpBtn');
+    const otpInputField        = document.getElementById('otpInputField');
+    const otpLoadingBox        = document.getElementById('otpLoadingBox');
+    const authBtnRow           = document.getElementById('authBtnRow');
+    const downloadInvoiceBtn   = document.getElementById('downloadInvoiceBtn');
+
+    let countdownInterval;
+
+    // Step 1: Click "Proceed to Payment" -> VISA Loader fills 0% to 100% over 10 seconds
+    startPaymentBtn.addEventListener('click', function() {
+      paymentOverlay.classList.add('active');
+      visaLoaderBox.style.display = 'flex';
+      bankAuthCard.style.display = 'none';
+      transferModalCard.style.display = 'none';
+      successCard.style.display = 'none';
+
+      visaProgressFill.classList.remove('animating-10s');
+      void visaProgressFill.offsetWidth;
+      visaProgressFill.classList.add('animating-10s');
+
+      setTimeout(function() {
+        visaLoaderBox.style.display = 'none';
+        bankAuthCard.style.display = 'block';
+        otpInputField.focus();
+
+        let timeLeft = 99;
+        const timerSpan = document.getElementById('countdownSec');
+        timerSpan.textContent = timeLeft;
+        
+        clearInterval(countdownInterval);
+        countdownInterval = setInterval(() => {
+          timeLeft--;
+          timerSpan.textContent = timeLeft;
+          if (timeLeft <= 0) {
+            clearInterval(countdownInterval);
+          }
+        }, 1000);
+
+      }, 10000);
+    });
+
+    // Step 2: Click "Submit" on OTP -> Inline spinner for 10s -> "Payment Transferring..." popup for 5s -> Success
+    submitOtpBtn.addEventListener('click', function() {
+      if (!otpInputField.value.trim()) {
+        alert('Please enter the OTP sent to your registered mobile number.');
+        return;
+      }
+
+      authBtnRow.style.display = 'none';
+      otpLoadingBox.style.display = 'block';
+      otpInputField.disabled = true;
+
+      setTimeout(function() {
+        clearInterval(countdownInterval);
+        bankAuthCard.style.display = 'none';
+        
+        transferModalCard.style.display = 'block';
+        transferProgressFill.classList.remove('animating-5s');
+        void transferProgressFill.offsetWidth;
+        transferProgressFill.classList.add('animating-5s');
+
+        setTimeout(function() {
+          transferModalCard.style.display = 'none';
+          successCard.style.display = 'block';
+        }, 5000);
+
+      }, 10000);
+    });
+
+    // Handle Cancellation
+    cancelOtpBtn.addEventListener('click', function() {
+      clearInterval(countdownInterval);
+      paymentOverlay.classList.remove('active');
+      otpInputField.value = '';
+      otpInputField.disabled = false;
+      otpLoadingBox.style.display = 'none';
+      authBtnRow.style.display = 'flex';
+    });
+
+    // DYNAMIC INVOICE GENERATION & DOWNLOAD
+    downloadInvoiceBtn.addEventListener('click', function() {
+      const invoiceHTML = `
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+          <meta charset="UTF-8">
+          <title>Invoice — You Mart — intelEcho</title>
+          <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+          <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.2/css/all.min.css">
+          <style>
+            body { font-family: 'Inter', sans-serif; padding: 40px; color: #1e293b; background: #fff; }
+            .invoice-card { max-width: 750px; margin: 0 auto; border: 1px solid #e2e8f0; border-radius: 12px; padding: 40px; }
+            .invoice-header { display: flex; justify-content: space-between; border-bottom: 2px solid #f8fafc; padding-bottom: 24px; }
+            .logo { font-size: 1.8rem; font-weight: 800; color: #0f172a; }
+            .logo span { color: #2563eb; }
+            .title h1 { margin: 0; font-size: 1.8rem; color: #0f172a; }
+            .badge { display: inline-block; background: #dcfce7; color: #15803d; font-weight: 700; font-size: 0.75rem; padding: 3px 8px; border-radius: 4px; margin-top: 4px; }
+            .meta-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin: 28px 0; }
+            .meta-box h3 { font-size: 0.8rem; color: #64748b; text-transform: uppercase; margin-bottom: 6px; }
+            .meta-box p { margin: 2px 0; font-size: 0.95rem; }
+            table { width: 100%; border-collapse: collapse; margin: 24px 0; }
+            th { background: #f8fafc; padding: 10px; text-align: left; font-size: 0.85rem; color: #64748b; border-bottom: 1px solid #e2e8f0; }
+            td { padding: 12px 10px; border-bottom: 1px solid #e2e8f0; font-size: 0.95rem; }
+            .summary { width: 280px; margin-left: auto; }
+            .summary-line { display: flex; justify-content: space-between; padding: 6px 0; font-size: 0.95rem; color: #64748b; }
+            .summary-line.total { border-top: 2px solid #0f172a; font-size: 1.15rem; font-weight: 800; color: #0f172a; margin-top: 6px; padding-top: 10px; }
+            .footer { margin-top: 40px; border-top: 1px solid #e2e8f0; padding-top: 20px; text-align: center; font-size: 0.85rem; color: #64748b; }
+          </style>
+        </head>
+        <body>
+          <div class="invoice-card">
+            <div class="invoice-header">
+              <div class="logo">intel<span>Echo</span></div>
+              <div class="title" style="text-align:right;">
+                <h1>INVOICE</h1>
+                <div style="font-size:0.85rem; color:#64748b;">INV-2026-0813</div>
+                <div class="badge">PAID</div>
+              </div>
+            </div>
+            <div class="meta-grid">
+              <div class="meta-box">
+                <h3>Billed To</h3>
+                <p><strong>You Mart</strong></p>
+                <p>Billing Dept / Accounts</p>
+                <p>Registered Customer</p>
+              </div>
+              <div class="meta-box" style="text-align:right;">
+                <h3>Invoice Details</h3>
+                <p><strong>Date Issued:</strong> 13-Aug-2026</p>
+                <p><strong>Payment Status:</strong> Completed</p>
+                <p><strong>Method:</strong> Visa ending in 7448</p>
+              </div>
+            </div>
+            <table>
+              <thead>
+                <tr>
+                  <th>Description</th>
+                  <th>Billing</th>
+                  <th style="text-align:right;">Qty</th>
+                  <th style="text-align:right;">Amount</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>Starter — Launch Plan</strong><br><span style="font-size:0.8rem; color:#64748b;">1,000 SKUs sync, Margin floor protection</span></td>
+                  <td>Monthly</td>
+                  <td style="text-align:right;">1</td>
+                  <td style="text-align:right;">$220.00</td>
+                </tr>
+              </tbody>
+            </table>
+            <div class="summary">
+              <div class="summary-line"><span>Subtotal</span><span>$220.00</span></div>
+              <div class="summary-line"><span>Tax / GST</span><span>$0.00</span></div>
+              <div class="summary-line total"><span>Total Paid</span><span>$220.00</span></div>
+            </div>
+            <div class="footer">
+              <p>Thank you for choosing intelEcho Inc. Support: support@intelecho.ai</p>
+            </div>
+          </div>
+          <script>
+            window.onload = function() {
+              window.print();
+            };
+          <\/script>
+        </body>
+        </html>
+      `;
+
+      const invoiceWindow = window.open('', '_blank');
+      invoiceWindow.document.write(invoiceHTML);
+      invoiceWindow.document.close();
+    });
+  </script>
+</body>
+</html>
